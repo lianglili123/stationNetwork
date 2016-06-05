@@ -1,0 +1,83 @@
+node {
+  diameter: 50px;
+  color: #A5ABB6;
+  border-color: #9AA1AC;
+  border-width: 2px;
+  text-color-internal: #FFFFFF;
+  font-size: 10px;
+}
+
+relationship {
+  color: #A5ABB6;
+  shaft-width: 1px;
+  font-size: 8px;
+  padding: 3px;
+  text-color-external: #000000;
+  text-color-internal: #FFFFFF;
+  caption: '<id>';
+}
+
+
+node.M_node {
+  color: #F62E36;
+  border-color: #F62E36;
+  text-color-internal: #FFFFFF;
+  caption: '{name}';
+}
+
+node.F_node {
+  color: #9C5E31;
+  border-color: #9C5E31;
+  text-color-internal: #FFFFFF;
+  caption: '{name}';
+}
+
+node.C_node {
+  color: #00BB85;
+  border-color: #00BB85;
+  text-color-internal: #FFFFFF;
+  caption: '{name}';
+}
+
+node.Z_node {
+  color: #8F76D6;
+  border-color: #8F76D6;
+  text-color-internal: #FFFFFF;
+  caption: '{name}';
+}
+
+node.N_node {
+  color: #00AC9B;
+  border-color: #00AC9B;
+  text-color-internal: #FFFFFF;
+  caption: '{name}';
+}
+
+node.H_node {
+  color: #B5B5AC;
+  border-color: #B5B5AC;
+  text-color-internal: #FFFFFF;
+  caption: '{name}';
+}
+
+node.Y_node {
+  color: #C1A470;
+  border-color: #C1A470;
+  text-color-internal: #FFFFFF;
+  caption: '{name}';
+}
+
+node.T_node {
+  color: #009BBF;
+  border-color: #009BBF;
+  text-color-internal: #FFFFFF;
+  caption: '{name}';
+}
+
+node.G_node {
+  color: #FF9500;
+  border-color: #FF9500;
+  text-color-internal: #604A0E;
+  caption: '{name}';
+}
+
