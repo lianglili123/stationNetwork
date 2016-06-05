@@ -11,29 +11,27 @@ class Entity():
 class Line(Entity):
 	stations=list()#駅のエンティティを保持する
 	checked=0
-	def savelines(cur):
-		if checked==1:
-			cur.execute("insert or replace into line ( name,link) values = (?,?)",(self.name,self.link,))
+	def saveline(self,cur):
+		if self.checked==1:
+			cur.execute("insert or replace into line ( name,link) values  (?,?)",(self.name,self.link))
 			for station in self.stations:
-				station.savestations(cur,line)
+				station.savestation(cur,self.name)
 
 class Station(Entity):
 	seq=int()
 	tllst=list()#乗り換え線路名
-	def savestations(cur,line):
-		cur.execute("insert or replace into station ( lname,seq,name,link) values = (?,?,?,?)",
-		(line,self.seq,self.name,self.link,))
+	def savestation(self,cur,line):
+		cur.execute("insert or replace into station ( lname,seq,name,link) values  (?,?,?,?)",
+		(line,self.seq,self.name,self.link))
 		for tline in self.tllst:
-			cur.execute("insert or replace into transfer ( lname,seq,tolname) values = (?,?,?)",
-			(line,self.seq,tline,))
+			cur.execute("insert or replace into transfer ( lname,seq,tolname) values (?,?,?)",
+			(line,self.seq,tline))
 
 fname="GinzaLine.html"
 baseurl="http://www.tokyometro.jp/station/line_ginza/index.html"
 ll=dict() #線路情報を保持するリスト
 
-
-#while len(linelst)==0 or len(linelst)>len(data):
-for i in range(5):
+for i in range(9):
 	i+=1
 	line=Line()
 	#llに要素がゼロのとき、銀座線から
@@ -61,7 +59,8 @@ for i in range(5):
 	#線路名を設定
 	root=et.fromstring(html,et.HTMLParser())
 	lineName=root.xpath('//meta[@name="keywords"]')[0].attrib["content"].split(",")[0].split("/")[0]	
-	line.name=lineName
+	lineName1=root.xpath('//meta[@name="keywords"]')[0].attrib["content"].split(",")[0]
+	line.name=lineName1
 
 	statlst=list()
 	stations=root.xpath('//table//tr')
@@ -106,7 +105,7 @@ for i in range(5):
 	#線路の情報を補完する
 	line.stations=statlst
 	line.checked=1
-	ll[line.name]=line
+	ll[lineName]=line
 
 	print "-------------------"
 	print line.name+":"+line.link+":"
@@ -119,4 +118,14 @@ import sqlite3
 conn=sqlite3.connect("metro.sqlite")
 cur=conn.cursor()
 
-cur.execute("drop table if exists line ")
+cur.execute('''drop table if exists line ''')
+cur.execute('''drop table if exists station ''')
+cur.execute('''drop table if exists transfer ''')
+cur.execute('''create table line ( name text unique, link text) ''')
+cur.execute('''create table station ( lname text , seq integer, name text,link text) ''')
+cur.execute('''create table transfer (lname text , seq integer,tolname text) ''')
+
+for l in ll.values():
+	l.saveline(cur)
+	
+conn.commit()
