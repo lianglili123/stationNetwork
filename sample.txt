@@ -1,0 +1,64 @@
+<!-- 駅：start -->
+<tr class="v2_routeStationFirst">
+  <td class="v2_cellCheck"><label class="v2_formCheckBoxArea"><input type="checkbox" value="Ginza.Shibuya" class="v2_js-check"><span class="v2_formCheckBoxTxt">チェック</span></label></td>
+  <td class="v2_cellStation">
+    <div class="v2_routeStationImg"><img src="../../library/common/img/station/icon_g01.png" alt="G01"></div>
+    <p class="v2_routeStationName"><span class="v2_linkIcon"><a href="../shibuya/index.html">渋谷</a></span></p>
+  </td>
+  <td class="v2_cellTransfer v2_js-clickTooltip">
+    <a href="#" class="v2_js-clickTooltipBtn">
+      <ul class="v2_routeTransfer">
+        <li><img src="../../library/common/img/route/icon_hanzomon.png" alt="半蔵門線"></li>
+        <li><img src="../../library/common/img/route/icon_fukutoshin.png" alt="副都心線"></li>
+      </ul>
+      <ul class="v2_routeTransferOther">
+        <li><img src="../../library/station/img/icon_other_route.png" alt="JR線"></li>
+        <li><img src="../../library/station/img/icon_other_route.png" alt="東急線"></li>
+        <li><img src="../../library/station/img/icon_other_route.png" alt="京王井の頭線"></li>
+      </ul>
+    </a>
+    <div class="v2_routeTransferLink v2_js-clickTooltipBody">
+      <p class="v2_fontSPc v2_txtC v2_txtBold">東京メトロ線</p>
+      <ul class="v2_routeTransferList">
+        <li><img src="../../library/common/img/route/icon_hanzomon.png" alt="" class="v2_transferImg"><span class="v2_linkIcon v2_transferLink"><a href="../line_hanzomon/index.html">半蔵門線</a></span></li>
+        <li><img src="../../library/common/img/route/icon_fukutoshin.png" alt="" class="v2_transferImg"><span class="v2_linkIcon v2_transferLink"><a href="../line_fukutoshin/index.html">副都心線</a></span></li>
+      </ul>
+      <p class="v2_fontSPc v2_txtC v2_txtBold v2_sectionMS">他社線</p>
+      <ul class="v2_routeTransferListOther">
+        <li><img src="../../library/station/img/icon_other_route.png" alt="" class="v2_transferImg"><span class="v2_linkIcon v2_transferLink"><a class="v2_linkBlank" href="http://www.jreast.co.jp/" target="_blank">JR線</a></span></li>
+        <li><img src="../../library/station/img/icon_other_route.png" alt="" class="v2_transferImg"><span class="v2_linkIcon v2_transferLink"><a class="v2_linkBlank" href="http://www.tokyu.co.jp/" target="_blank">東急線</a></span></li>
+      </ul>
+      <ul class="v2_routeTransferListOther">
+        <li class="v2_w100p"><img src="../../library/station/img/icon_other_route.png" alt="" class="v2_transferImg"><span class="v2_linkIcon v2_transferLink"><a class="v2_linkBlank" href="http://www.keio.co.jp/" target="_blank">京王井の頭線</a></span></li>
+      </ul>
+    </div>
+  </td>
+  <td class="v2_cellLast"><!-- <p class="v2_txtNowrap v2_linkIcon"><a href="" class="v2_linkPdf">終電接続</a></p> --></td>
+</tr>
+<!-- 駅：End -->
+
+<!-- 駅：start -->
+<tr>
+  <td class="v2_cellCheck"><label class="v2_formCheckBoxArea"><input type="checkbox" value="Ginza.OmoteSando" class="v2_js-check"><span class="v2_formCheckBoxTxt">チェック</span></label></td>
+  <td class="v2_cellStation">
+    <div class="v2_routeStationImg"><img src="../../library/common/img/station/icon_g02.png" alt="G02"></div>
+    <p class="v2_routeStationName"><span class="v2_linkIcon"><a href="../omote-sando/index.html">表参道</a></span></p>
+  </td>
+  <td class="v2_cellTransfer v2_js-clickTooltip">
+    <a href="#" class="v2_js-clickTooltipBtn">
+      <ul class="v2_routeTransfer">
+        <li><img src="../../library/common/img/route/icon_chiyoda.png" alt="千代田線"></li>
+        <li><img src="../../library/common/img/route/icon_hanzomon.png" alt="半蔵門線"></li>
+      </ul>
+    </a>
+    <div class="v2_routeTransferLink v2_js-clickTooltipBody">
+      <p class="v2_fontSPc v2_txtC v2_txtBold">東京メトロ線</p>
+      <ul class="v2_routeTransferList">
+        <li><img src="../../library/common/img/route/icon_chiyoda.png" alt="" class="v2_transferImg"><span class="v2_linkIcon v2_transferLink"><a href="../line_chiyoda/index.html">千代田線</a></span></li>
+        <li><img src="../../library/common/img/route/icon_hanzomon.png" alt="" class="v2_transferImg"><span class="v2_linkIcon v2_transferLink"><a href="../line_hanzomon/index.html">半蔵門線</a></span></li>
+      </ul>
+    </div>
+  </td>
+  <td class="v2_cellLast"><!-- <p class="v2_txtNowrap v2_linkIcon"><a href="" class="v2_linkPdf">終電接続</a></p> --></td>
+</tr>
+<!-- 駅：End -->
