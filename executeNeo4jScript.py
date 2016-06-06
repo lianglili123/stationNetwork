@@ -32,7 +32,7 @@ data=json.dumps({"statements": sl})
 request=ulib2.Request(url,data,headers)
 
 username="neo4j"
-password="SSD0564"
+password="neo4j"
 base64string = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
 request.add_header("Authorization", "Basic %s" % base64string)   
 
