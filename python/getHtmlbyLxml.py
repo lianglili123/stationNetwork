@@ -5,19 +5,18 @@ from lxml import etree as et
 import sys
 import sqlite3
 
-def getCompany(link):
-	if link.find("tokyometro")>0:
-		print link
-		return "tokyometro"
-	elif link.find("jreast")>0:
-		return "jreast"
-	elif link.find("keisei")>0:
-		return "keisei"
-	elif link.find("yurikamome")>0:
-		return "yurikamome"
-	elif link.find("metro.tokyo")>0:
-		return "metro.tokyo"
-
+class Extractor():
+	def getCompany(self,link):
+		if link.find("tokyometro")>0:
+			return "tokyometro"
+		elif link.find("jreast")>0:
+			return  "jreast"
+		elif link.find("keisei")>0:
+			return  "keisei"
+		elif link.find("yurikamome")>0:
+			return  "yurikamome"
+		elif link.find("metro.tokyo")>0:
+			return  "metro.tokyo"
 class Entity():
 	name=""
 	link=""	
@@ -27,10 +26,9 @@ class Line(Entity):
 	checked=0
 	def saveline(self,cur):
 		if self.checked==1:
-			cur.execute("insert or replace into line ( name,link) values  (?,?)",(self.name,self.link))
+			cur.execute("insert or replace into line ( name,link,company) values  (?,?,?)",(self.name,self.link,self.company))
 			for station in self.stations:
 				station.savestation(cur,self.name)
-
 class Station(Entity):
 	seq=int()
 	tllst=list()#乗り換え線路名
@@ -40,9 +38,8 @@ class Station(Entity):
 		for tline in self.tllst:
 			cur.execute("insert or replace into transfer ( lname,seq,tolname,tosname) values (?,?,?,?)",
 			(line,self.seq,tline[0],tline[1]))
-
-class TokyoMetroExtractor():
-	startline="http://www.tokyometro.jp/station/line_ginza/index.html"
+class TokyoMetroExtractor(Extractor):
+	baseurl="http://www.tokyometro.jp/station/line_ginza/index.html"
 	def extractStations(self,root,ll):
 		statlst=list()
 		stationsRoot=root.xpath('//table//tr')
@@ -50,7 +47,7 @@ class TokyoMetroExtractor():
 			stree=et.ElementTree(station)
 			stationName=stree.xpath('//td//p[@class="v2_routeStationName"]//text()')
 			if len(stationName)>0 :
-				stationLink=urlparse.urljoin(baseurl,stree.xpath('//td//p[@class="v2_routeStationName"]//@href')[0])	
+				stationLink=urlparse.urljoin(self.baseurl,stree.xpath('//td//p[@class="v2_routeStationName"]//@href')[0])	
 
 				tslst=list()
 				self.extractTransfer(stree.xpath('//td//ul[@class="v2_routeTransferList"]/li'),ll,tslst)
@@ -71,78 +68,82 @@ class TokyoMetroExtractor():
 				tsname=""
 			elif len(ttree.xpath('//text()'))==2:
 				tsname=ttree.xpath('//text()')[1]
+				tsname=tsname[1:tsname.find(u'駅')]
 			tname=ttree.xpath('//text()')[0]
 			tlink=ttree.xpath('//@href')[0]
 			tslst.append((tname,tsname))
 			#線路情報を格納する
 			tl=Line()
 			tl.name=tname
-			tl.link=tlink
+			tl.link=urlparse.urljoin(self.baseurl,tlink)
 			ll[tname]=ll.get(tname,tl)
-		
-	
-	#def extractLines(self,line):
-	
-baseurl="http://www.tokyometro.jp/station/line_ginza/index.html"
-ll=dict() #線路情報を保持するリスト
 
-for i in range(2):
+	def extractLine(self,line,ll):
+		response= url.urlopen(line.link)
+		line.company=extractor.getCompany(line.link)
+		html=response.read()
+		#線路名を設定
+		root=et.fromstring(html,et.HTMLParser())
+		#代表英文字付きの線路名
+		lineName=root.xpath('//meta[@name="keywords"]')[0].attrib["content"].split(",")[0].split("/")[0]	
+		#線路名のみ
+		lineName1=root.xpath('//meta[@name="keywords"]')[0].attrib["content"].split(",")[0]
+		line.name=lineName1
+
+		#線路の情報を補完する
+		line.stations=self.extractStations(root,ll)
+		line.checked=1
+		ll[lineName]=line
+
+ll=dict() #線路情報を保持するリスト
+extractor=TokyoMetroExtractor()
+
+for i in range(9):
 	i+=1
 	line=Line()
 	#llに要素がゼロのとき、銀座線から
 	if len(ll)==0:
-		line.link=baseurl
+		line.link=extractor.baseurl
 	else:
 		lst4sort=list()
 		for k,v in ll.items():
 			lst4sort.append((v.checked,k))
 		lst4sort.sort()
-		print str(lst4sort).decode("unicode-escape")
 		for j in range(len(lst4sort)):
 			print lst4sort[j][0],lst4sort[j][1]
 			if ll[lst4sort[j][1]].checked==0:
 				if ll[lst4sort[j][1]].link.find("tokyometro")>0:
-					line.link=ll[lst4sort[j][1]].link
-					line.company=getCompany(line.link)
+					line.link=ll[lst4sort[j][1]].link				
 					break
+				elif ll[lst4sort[j][1]].link.find("jreast")>0:
+					continue
+				elif ll[lst4sort[j][1]].link.find("keisei")>0:
+					continue
+				elif ll[lst4sort[j][1]].link.find("yurikamome")>0:
+					continue
+				elif ll[lst4sort[j][1]].link.find("metro.tokyo")>0:
+					continue
 			j+=1
-				
-		print line.link
-	
-	response= url.urlopen(line.link)
-	html=response.read()
-
-	#線路名を設定
-	root=et.fromstring(html,et.HTMLParser())
-	#代表英文字付きの線路名
-	lineName=root.xpath('//meta[@name="keywords"]')[0].attrib["content"].split(",")[0].split("/")[0]	
-	#線路名のみ
-	lineName1=root.xpath('//meta[@name="keywords"]')[0].attrib["content"].split(",")[0]
-	line.name=lineName1
-
-	extractor=TokyoMetroExtractor()
-
-	#線路の情報を補完する
-	line.stations=extractor.extractStations(root,ll)
-	line.checked=1
-	ll[lineName]=line
+	print line.link
+	extractor.extractLine(line,ll)
 
 	print "-------------------"
 	print line.name+":"+line.link+":"+line.company
 	print line.checked
 	for s in line.stations:
 		print ">>>>>",s.seq,s.name,s.link,str(s.tllst).decode("unicode-escape")
+	print "==================="		
+	#for l in ll.values():
+	#	print l.name+":"+l.link
 		
 #取得した情報をsqliteに出力する
-
-
 conn=sqlite3.connect("../sqlite/metro.sqlite")
 cur=conn.cursor()
 
 cur.execute('''drop table if exists line ''')
 cur.execute('''drop table if exists station ''')
 cur.execute('''drop table if exists transfer ''')
-cur.execute('''create table line ( name text unique, link text) ''')
+cur.execute('''create table line ( name text unique, link text, company text) ''')
 cur.execute('''create table station ( lname text , seq integer, name text,link text) ''')
 cur.execute('''create table transfer (lname text , seq integer,tolname text,tosname text) ''')
 
