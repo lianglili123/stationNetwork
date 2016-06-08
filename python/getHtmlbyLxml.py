@@ -36,8 +36,8 @@ class Station(Entity):
 		cur.execute("insert or replace into station ( lname,seq,name,link) values  (?,?,?,?)",
 		(line,self.seq,self.name,self.link))
 		for tline in self.tllst:
-			cur.execute("insert or replace into transfer ( lname,seq,tolname,tosname) values (?,?,?,?)",
-			(line,self.seq,tline[0],tline[1]))
+			cur.execute("insert or replace into transfer ( lname,sname,tolname,tosname) values (?,?,?,?)",
+			(line,self.name,tline[0],tline[1]))
 class TokyoMetroExtractor(Extractor):
 	baseurl="http://www.tokyometro.jp/station/line_ginza/index.html"
 	def extractStations(self,root,ll):
@@ -95,10 +95,53 @@ class TokyoMetroExtractor(Extractor):
 		line.checked=1
 		ll[lineName]=line
 
+class MetroTokyoExtractor(Extractor):
+	baseurl="http://www.kotsu.metro.tokyo.jp"
+	def extractLine(self,line,ll):
+		response=url.urlopen(line.link+"subway/stations/")
+		line.company=extractor.getCompany(line.link)
+		html=response.read()
+		lineName=line.name
+		root=et.fromstring(html,et.HTMLParser()).xpath('//map/area')
+		if line.name==u'都営浅草線':
+			line.name+="/A"
+			line.stations=self.extractStations(root,ll,"a")
+		elif line.name==u'都営三田線':
+			line.name+="/I"
+			line.stations=self.extractStations(root,ll,"i")
+		elif line.name==u'都営新宿線':
+			line.name+="/S"
+			line.stations=self.extractStations(root,ll,"s")
+		elif line.name==u'都営大江戸線':
+			line.name+="/E"
+			line.stations=self.extractStations(root,ll,"e")
+		line.checked=1
+		ll[lineName]=line
+		
+	def extractStations(self,stations,ll,linestr):
+		tmp=dict()
+		for station in stations:
+			stree=et.ElementTree(station)
+			stationLink=stree.xpath('//@href')[0]
+			if stationLink.split("/")[4].startswith(linestr):
+				stationName=stree.xpath('//@title')[0].split(u'（')[0]
+				if stationName in tmp.keys():
+					continue
+				stationSeq=int(stree.xpath('//@href')[0].split("/")[4].split(".")[0][1:])
+			else:
+				continue
+			s=Station()
+			s.name=stationName
+			s.seq=stationSeq
+			s.link=urlparse.urljoin(self.baseurl,stationLink)
+			
+			tmp[s.name]=s
+		return tmp.values()
+
 ll=dict() #線路情報を保持するリスト
 extractor=TokyoMetroExtractor()
 
-for i in range(9):
+for i in range(13):
 	i+=1
 	line=Line()
 	#llに要素がゼロのとき、銀座線から
@@ -113,7 +156,14 @@ for i in range(9):
 			print lst4sort[j][0],lst4sort[j][1]
 			if ll[lst4sort[j][1]].checked==0:
 				if ll[lst4sort[j][1]].link.find("tokyometro")>0:
-					line.link=ll[lst4sort[j][1]].link				
+					line.link=ll[lst4sort[j][1]].link	
+					line.name=ll[lst4sort[j][1]].name			
+					break
+				elif ll[lst4sort[j][1]].link.find("metro.tokyo")>0 and lst4sort[j][1].find(u'日暮里・舎人ライナー')<0:
+					line.link=ll[lst4sort[j][1]].link
+					#都営地下鉄の線路は全て共有一つリンクのため
+					line.name=ll[lst4sort[j][1]].name
+					extractor=MetroTokyoExtractor()
 					break
 				elif ll[lst4sort[j][1]].link.find("jreast")>0:
 					continue
@@ -121,8 +171,7 @@ for i in range(9):
 					continue
 				elif ll[lst4sort[j][1]].link.find("yurikamome")>0:
 					continue
-				elif ll[lst4sort[j][1]].link.find("metro.tokyo")>0:
-					continue
+
 			j+=1
 	print line.link
 	extractor.extractLine(line,ll)
@@ -145,7 +194,7 @@ cur.execute('''drop table if exists station ''')
 cur.execute('''drop table if exists transfer ''')
 cur.execute('''create table line ( name text unique, link text, company text) ''')
 cur.execute('''create table station ( lname text , seq integer, name text,link text) ''')
-cur.execute('''create table transfer (lname text , seq integer,tolname text,tosname text) ''')
+cur.execute('''create table transfer (lname text , sname integer,tolname text,tosname text) ''')
 
 for l in ll.values():
 	l.saveline(cur)
